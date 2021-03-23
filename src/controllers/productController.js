@@ -50,3 +50,27 @@ exports.getProductInformation = async (req, res, next) => {
     res.status(500).json({ error: err });
   }
 };
+
+exports.getProduct = async (req, res, next) => {
+  try {
+    const baseUrl = 'http://localhost:4000/products';
+    const productByIdUrl = `${baseUrl}/${req.params.product_id}`;
+
+    let data = cachedProducts.get(req.params.product_id);
+
+    if (!data) {
+      data = await axios.get(productByIdUrl);
+
+      cachedProducts.set(req.params.product_id, data);
+    } else {
+      console.log('cachedProducts cache hit');
+    }
+    res.status(200).json({
+      ...data.data.data,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({ error: err });
+  }
+};
