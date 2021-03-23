@@ -12,7 +12,8 @@ exports.getProductInformation = async (req, res, next) => {
   // call the related products route
   // combine data together and try to respect the legacy data contract
   try {
-    const baseUrl = 'http://localhost:4000/products';
+    const uri = 'http://localhost:4000' || process.env.PRODUCT_API_URL;
+    const baseUrl = `${uri}/products`;
     const productByIdUrl = `${baseUrl}/${req.params.product_id}`;
     const productStylesUrl = `${productByIdUrl}/styles`;
     const relatedProductsUrl = `${productByIdUrl}/related`;
