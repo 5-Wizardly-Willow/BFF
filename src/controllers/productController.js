@@ -12,7 +12,7 @@ exports.getProductInformation = async (req, res, next) => {
   // call the related products route
   // combine data together and try to respect the legacy data contract
   try {
-    const uri = 'http://localhost:4000' || process.env.PRODUCT_API_URL;
+    const uri = process.env.PRODUCT_API_URL || 'http://localhost:4000';
     const baseUrl = `${uri}/products`;
     const productByIdUrl = `${baseUrl}/${req.params.product_id}`;
     const productStylesUrl = `${productByIdUrl}/styles`;
@@ -68,6 +68,31 @@ exports.getProduct = async (req, res, next) => {
     }
     res.status(200).json({
       ...data.data.data,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({ error: err });
+  }
+};
+
+exports.getProductStyles = async (req, res, next) => {
+  try {
+    const baseUrl = 'http://localhost:4000/products';
+    const productStylesUrl = `${baseUrl}/${req.params.product_id}/styles`;
+
+    let data = cachedProducts.get(req.params.product_id);
+
+    if (!data) {
+      data = await axios.get(productStylesUrl);
+
+      cachedProducts.set(req.params.product_id, data);
+    } else {
+      console.log('cachedProducts cache hit');
+    }
+    res.status(200).json({
+      product_id: req.params.product_id,
+      results: data.data.data,
     });
   } catch (err) {
     console.log(err);
